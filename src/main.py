@@ -4,8 +4,9 @@ __version__ = "1.0.0"
 import itertools
 
 import pandas as pd
+
 from snowcleaner.model.pair_generator import calculate_similarity_scores_for_pairs, block_records_with_threshold
-from snowcleaner.model.train_model import train_model, predict
+from src.snowcleaner.model.train_model import train_model, predict
 
 features = ["first_name", "last_name", "address", "city", "state", "country"]
 
