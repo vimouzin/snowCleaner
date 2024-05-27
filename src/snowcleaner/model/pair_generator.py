@@ -1,3 +1,5 @@
+# model/pair_generator.py
+
 def jaccard_similarity(str1, str2):
     # Convert the input strings into sets of characters
     set1 = set(str1)

@@ -1,3 +1,5 @@
+# model/train_model.py
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -32,7 +34,6 @@ def train_model(data):
 
     # Evaluate the accuracy of the model
     accuracy = accuracy_score(y_test, y_pred)
-    print("Accuracy:", accuracy)
 
     # Return the trained classifier model
     return rf_classifier
@@ -47,15 +48,12 @@ def predict(rf_classifier, data):
         data (DataFrame): Input DataFrame for making predictions.
 
     Returns:
-        array-like: Predicted labels.
+        DataFrame: DataFrame containing original columns, the primary key, and the predicted labels.
         DataFrame: DataFrame containing feature importance's.
     """
-    # Make predictions
-    X = data.drop("pair", axis=1)
+    # Ensure that the features match those used during training
+    X = data.drop(["pk", "pk_2"], axis=1)
     new_predictions = rf_classifier.predict(X)
-
-    # Print the predictions
-    print(new_predictions)
 
     # Get feature importances
     feature_importances = rf_classifier.feature_importances_
@@ -66,8 +64,11 @@ def predict(rf_classifier, data):
     # Sort the DataFrame by importance values
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
 
-    # Print or visualize the feature importance's
-    print(feature_importance_df)
+    # Create a DataFrame with the original columns and the new predictions
+    result_df = data.copy()
+    result_df['predictions'] = new_predictions
+    result_df = result_df[['pk_2', 'pk', 'predictions']]  # Include only 'pair', 'pk', and 'predictions'
 
-    # Return predictions and feature importance's DataFrame
-    return new_predictions, feature_importance_df
+    # Return the modified DataFrame and feature importance's DataFrame
+    return result_df
+
