@@ -1,4 +1,6 @@
 # model/pair_generator.py
+import pandas as pd
+
 
 def jaccard_similarity(str1, str2):
     # Convert the input strings into sets of characters
@@ -39,9 +41,11 @@ def calculate_similarity_scores_for_pairs(features, pair_1, pair_2):
 
         # Calculate the Jaccard similarity score for the current feature and store it in the scores dictionary
         scores[feature] = jaccard_similarity(set1, set2)
-
+        scores["pk"] = pair_1["pk"]
+        scores["pk_2"] = pair_2["pk"]
     # Return the dictionary of similarity scores
     return scores
+
 
 
 def block_records_with_threshold(data, thresholds):
@@ -53,6 +57,19 @@ def block_records_with_threshold(data, thresholds):
     - thresholds: Dictionary containing attribute names as keys and corresponding thresholds as values
 
     Returns:
-    - List of pairs of records that meet the similarity threshold for each attribute
+    - DataFrame containing records that meet the similarity threshold for each attribute
     """
-    return data[(data >= thresholds).all(axis=1)]
+    # Convert columns to appropriate types
+    data = data.apply(pd.to_numeric)
+
+    # Make sure columns in the DataFrame match the keys in the thresholds dictionary
+    common_columns = set(data.columns) & set(thresholds.keys())
+    if len(common_columns) != len(thresholds):
+        raise ValueError("Columns in data and thresholds do not match")
+
+    # Apply threshold checks for each attribute
+    condition = True
+    for column, threshold in thresholds.items():
+        condition &= (data[column].apply(float) >= float(threshold))
+
+    return data[condition]

@@ -20,6 +20,6 @@ def generate_cluster_ids(result_df):
             group_dict[node] = group_id
 
     # Create a new column in the DataFrame for group ID
-    result_df['group_id'] = result_df['pk'].map(group_dict)
+    result_df['group_id'] = result_df.apply(lambda x: group_dict.get(x['pk'], -1) if x['predictions'] > 0 else '', axis=1)
 
     return result_df
